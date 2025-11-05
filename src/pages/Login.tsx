@@ -15,10 +15,22 @@ const Login = () => {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simple mock authentication for demo
-    if (email && password) {
+    // Simple mock authentication - map emails to user IDs
+    const userMap: { [key: string]: string } = {
+      "warren@example.com": "1",
+      "bill@example.com": "2",
+      "jason@example.com": "3",
+      "steve@example.com": "4",
+      "donald@example.com": "5",
+      "phone@example.com": "6",
+    };
+    
+    const userId = userMap[email.toLowerCase()];
+    
+    if (email && password && userId) {
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userEmail", email);
+      localStorage.setItem("userId", userId);
       toast({
         title: "Login successful",
         description: "Welcome to Clockspot!",
@@ -27,7 +39,7 @@ const Login = () => {
     } else {
       toast({
         title: "Login failed",
-        description: "Please enter your email and password.",
+        description: "Please use one of the demo emails (e.g., jason@example.com).",
         variant: "destructive",
       });
     }
@@ -77,8 +89,11 @@ const Login = () => {
                 Sign In
               </Button>
             </form>
-            <div className="mt-4 text-center text-sm text-muted-foreground">
-              <p>Demo credentials: any email/password combination</p>
+            <div className="mt-4 text-center text-sm text-muted-foreground space-y-1">
+              <p className="font-medium">Demo accounts:</p>
+              <p>jason@example.com, steve@example.com, bill@example.com</p>
+              <p>warren@example.com, donald@example.com, phone@example.com</p>
+              <p className="text-xs">(any password works)</p>
             </div>
           </CardContent>
         </Card>

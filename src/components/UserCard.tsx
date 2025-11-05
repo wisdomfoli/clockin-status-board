@@ -9,16 +9,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import TimeSession from "./TimeSession";
+
+export interface TimeEntry {
+  clockIn: Date;
+  clockOut?: Date;
+}
 
 interface UserCardProps {
   id: string;
   firstName: string;
   lastName: string;
   isClockedIn: boolean;
+  timeEntries: TimeEntry[];
+  isCurrentUser: boolean;
   onToggleClock: (id: string) => void;
 }
 
-const UserCard = ({ id, firstName, lastName, isClockedIn, onToggleClock }: UserCardProps) => {
+const UserCard = ({ id, firstName, lastName, isClockedIn, timeEntries, isCurrentUser, onToggleClock }: UserCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`;
 
@@ -27,55 +35,75 @@ const UserCard = ({ id, firstName, lastName, isClockedIn, onToggleClock }: UserC
       className={cn(
         "relative bg-card border-2 rounded-lg p-4 transition-all duration-300",
         isClockedIn ? "border-accent shadow-md" : "border-border",
-        isHovered && "shadow-lg"
+        isHovered && isCurrentUser && "shadow-lg"
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex items-center gap-4">
-        <Avatar className="h-12 w-12">
-          <AvatarFallback className={cn(
-            "text-lg font-semibold",
-            isClockedIn ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"
-          )}>
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-        
-        <div className="flex-1">
-          <h3 className="font-medium text-card-foreground">
-            {lastName}, {firstName}
-          </h3>
-          <p className={cn(
-            "text-sm font-medium",
-            isClockedIn ? "text-success" : "text-muted-foreground"
-          )}>
-            {isClockedIn ? "Clocked In" : "Clocked Out"}
-          </p>
+      <div className="space-y-3">
+        <div className="flex items-center gap-4">
+          <Avatar className="h-12 w-12">
+            <AvatarFallback className={cn(
+              "text-lg font-semibold",
+              isClockedIn ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"
+            )}>
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div className="flex-1">
+            <h3 className="font-medium text-card-foreground">
+              {lastName}, {firstName}
+              {isCurrentUser && (
+                <span className="ml-2 text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded">
+                  You
+                </span>
+              )}
+            </h3>
+            <p className={cn(
+              "text-sm font-medium",
+              isClockedIn ? "text-success" : "text-muted-foreground"
+            )}>
+              {isClockedIn ? "Clocked In" : "Clocked Out"}
+            </p>
+          </div>
+
+          {isHovered && isCurrentUser && (
+            <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2">
+              <Button
+                size="icon"
+                variant={isClockedIn ? "destructive" : "default"}
+                onClick={() => onToggleClock(id)}
+                className="h-9 w-9"
+              >
+                {isClockedIn ? <LogOut className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="icon" variant="ghost" className="h-9 w-9">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem>View Details</DropdownMenuItem>
+                  <DropdownMenuItem>Edit Profile</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
 
-        {isHovered && (
-          <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-2">
-            <Button
-              size="icon"
-              variant={isClockedIn ? "destructive" : "default"}
-              onClick={() => onToggleClock(id)}
-              className="h-9 w-9"
-            >
-              {isClockedIn ? <LogOut className="h-4 w-4" /> : <LogIn className="h-4 w-4" />}
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="icon" variant="ghost" className="h-9 w-9">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>View Details</DropdownMenuItem>
-                <DropdownMenuItem>Edit User</DropdownMenuItem>
-                <DropdownMenuItem className="text-destructive">Remove</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        {/* Time entries for today */}
+        {timeEntries.length > 0 && (
+          <div className="pl-16 space-y-1">
+            <p className="text-xs text-muted-foreground mb-2">Today's sessions:</p>
+            {timeEntries.map((entry, index) => (
+              <TimeSession
+                key={index}
+                clockIn={entry.clockIn}
+                clockOut={entry.clockOut}
+              />
+            ))}
           </div>
         )}
       </div>
