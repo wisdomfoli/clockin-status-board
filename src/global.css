@@ -1,0 +1,22 @@
+body {
+    font-family: "Montserrat", sans-serif;
+  }
+
+  .button_logo_color{
+    background-color: hsl(250.84deg 51.55% 31.57%);
+  }
+  
+  .button_logo_color:hover{
+    background-color: hsl(250.84deg 51.55% 31.57% / 0.9);
+  }
+  
+  .color{
+    color: hsl(250.84deg 51.55% 31.57%);
+  }
+
+  .user_style{
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  }
+.user_style:hover{
+    box-shadow: 0 0 10px 0 rgb(181, 222, 253);
+}
